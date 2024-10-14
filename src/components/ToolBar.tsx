@@ -10,14 +10,24 @@ import {
 
 interface Props {
   mode: ModeUnion;
+  isNavigatorShow: boolean;
   color: string;
   onClickBrush: () => void;
   onClickEraser: () => void;
+  onClickNavigator: () => void;
   onChangeColor: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const ToolBar: React.FC<Props> = (props) => {
-  const { mode, color, onClickBrush, onChangeColor, onClickEraser } = props;
+  const {
+    mode,
+    isNavigatorShow,
+    color,
+    onClickBrush,
+    onChangeColor,
+    onClickNavigator,
+    onClickEraser,
+  } = props;
 
   return (
     <div className="toolbar" id="toolbar">
@@ -35,7 +45,11 @@ const ToolBar: React.FC<Props> = (props) => {
       >
         <FontAwesomeIcon className="fas" icon={faEraser} />
       </div>
-      <div className="tool nav" id="navigator">
+      <div
+        className={`tool nav ${isNavigatorShow ? "active" : ""}`}
+        id="navigator"
+        onClick={onClickNavigator}
+      >
         <FontAwesomeIcon className="fas" icon={faMap} />
       </div>
       <div className="tool undo" id="undo">

@@ -10,6 +10,8 @@ function App() {
     mode,
     color,
     size,
+    isNavigatorShow,
+    navImage,
     onClickBrush,
     onChangeColor,
     onChangeSize,
@@ -17,15 +19,18 @@ function App() {
     onMouseMove,
     onMouseUp,
     onClickEraser,
+    onClickNavigator,
   } = useDrawing();
 
   return (
     <div className="container" id="container">
       <ToolBar
         mode={mode}
+        isNavigatorShow={isNavigatorShow}
         color={color}
         onClickBrush={onClickBrush}
         onClickEraser={onClickEraser}
+        onClickNavigator={onClickNavigator}
         onChangeColor={onChangeColor}
       />
       <DrawingBoard
@@ -41,7 +46,7 @@ function App() {
         size={size}
         onChangeSize={onChangeSize}
       />
-      <ImageNav />
+      <ImageNav isNavigatorShow={isNavigatorShow} navImage={navImage} />
     </div>
   );
 }

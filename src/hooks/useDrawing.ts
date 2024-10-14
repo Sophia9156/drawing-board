@@ -7,6 +7,8 @@ const useDrawing = () => {
   const [isMouseDown, setMouseDown] = useState(false);
   const [color, setColor] = useState("#000000");
   const [size, setSize] = useState("10");
+  const [isNavigatorShow, setNavigatorShow] = useState(false);
+  const [navImage, setNavImage] = useState<string | null>(null);
 
   const onClickBrush = () => {
     setMode(mode === "BRUSH" ? "NONE" : "BRUSH");
@@ -35,6 +37,11 @@ const useDrawing = () => {
         x: e.clientX - boundaries.left,
         y: e.clientY - boundaries.top,
       };
+  };
+
+  const updateNavigator = () => {
+    const image = canvasEl.current?.toDataURL();
+    if (image) setNavImage(image);
   };
 
   const onMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -71,10 +78,15 @@ const useDrawing = () => {
   const onMouseUp = () => {
     if (mode === "NONE") return;
     setMouseDown(false);
+    updateNavigator();
   };
 
   const onClickEraser = () => {
     setMode(mode === "ERASER" ? "NONE" : "ERASER");
+  };
+
+  const onClickNavigator = () => {
+    setNavigatorShow(!isNavigatorShow);
   };
 
   useEffect(() => {
@@ -86,6 +98,8 @@ const useDrawing = () => {
     mode,
     color,
     size,
+    isNavigatorShow,
+    navImage,
     onClickBrush,
     onChangeColor,
     onChangeSize,
@@ -93,6 +107,7 @@ const useDrawing = () => {
     onMouseMove,
     onMouseUp,
     onClickEraser,
+    onClickNavigator,
   };
 };
 
