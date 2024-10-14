@@ -12,11 +12,12 @@ interface Props {
   mode: ModeUnion;
   color: string;
   onClickBrush: () => void;
+  onClickEraser: () => void;
   onChangeColor: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const ToolBar: React.FC<Props> = (props) => {
-  const { mode, color, onClickBrush, onChangeColor } = props;
+  const { mode, color, onClickBrush, onChangeColor, onClickEraser } = props;
 
   return (
     <div className="toolbar" id="toolbar">
@@ -27,7 +28,11 @@ const ToolBar: React.FC<Props> = (props) => {
       >
         <FontAwesomeIcon className="fas" icon={faPaintBrush} />
       </div>
-      <div className="tool eraser" id="eraser">
+      <div
+        className={`tool eraser ${mode === "ERASER" ? "active" : ""}`}
+        id="eraser"
+        onClick={onClickEraser}
+      >
         <FontAwesomeIcon className="fas" icon={faEraser} />
       </div>
       <div className="tool nav" id="navigator">

@@ -1,4 +1,5 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { eraserColor, backgroundColor } from "@/constants";
 
 const useDrawing = () => {
   const canvasEl = useRef<HTMLCanvasElement | null>(null);
@@ -17,6 +18,14 @@ const useDrawing = () => {
 
   const onChangeSize = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSize(e.target.value);
+  };
+
+  const initCanvasBackgroundColor = () => {
+    const context = canvasEl.current?.getContext("2d");
+    if (context && canvasEl.current) {
+      context.fillStyle = backgroundColor;
+      context.fillRect(0, 0, canvasEl.current.width, canvasEl.current.height);
+    }
   };
 
   const getMousePosition = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -38,8 +47,13 @@ const useDrawing = () => {
       context.beginPath();
       context.moveTo(currentPosition.x, currentPosition.y);
       context.lineCap = "round";
-      context.strokeStyle = color;
-      context.lineWidth = Number(size);
+      if (mode === "BRUSH") {
+        context.strokeStyle = color;
+        context.lineWidth = Number(size);
+      } else if (mode === "ERASER") {
+        context.strokeStyle = eraserColor;
+        context.lineWidth = 50;
+      }
     }
   };
 
@@ -59,6 +73,14 @@ const useDrawing = () => {
     setMouseDown(false);
   };
 
+  const onClickEraser = () => {
+    setMode(mode === "ERASER" ? "NONE" : "ERASER");
+  };
+
+  useEffect(() => {
+    initCanvasBackgroundColor();
+  }, []);
+
   return {
     canvasEl,
     mode,
@@ -70,6 +92,7 @@ const useDrawing = () => {
     onMouseDown,
     onMouseMove,
     onMouseUp,
+    onClickEraser,
   };
 };
 

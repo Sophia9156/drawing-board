@@ -1,1 +1,1 @@
-type ModeUnion = "NONE" | "BRUSH";
+type ModeUnion = "NONE" | "BRUSH" | "ERASER";

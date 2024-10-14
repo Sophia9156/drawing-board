@@ -16,6 +16,7 @@ function App() {
     onMouseDown,
     onMouseMove,
     onMouseUp,
+    onClickEraser,
   } = useDrawing();
 
   return (
@@ -24,6 +25,7 @@ function App() {
         mode={mode}
         color={color}
         onClickBrush={onClickBrush}
+        onClickEraser={onClickEraser}
         onChangeColor={onChangeColor}
       />
       <DrawingBoard
