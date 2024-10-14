@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { eraserColor, backgroundColor } from "@/constants";
 
 const useDrawing = () => {
@@ -10,6 +10,7 @@ const useDrawing = () => {
   const [isNavigatorShow, setNavigatorShow] = useState(false);
   const [navImage, setNavImage] = useState<string | null>(null);
   const [undoArray, setUndoArray] = useState<string[]>([]);
+  const [downloadImage, setDownloadImage] = useState("");
 
   const onClickBrush = () => {
     setMode(mode === "BRUSH" ? "NONE" : "BRUSH");
@@ -26,6 +27,7 @@ const useDrawing = () => {
   const initCanvasBackgroundColor = () => {
     const context = canvasEl.current?.getContext("2d");
     if (context && canvasEl.current) {
+      context.clearRect(0, 0, canvasEl.current.width, canvasEl.current.height);
       context.fillStyle = backgroundColor;
       context.fillRect(0, 0, canvasEl.current.width, canvasEl.current.height);
     }
@@ -41,11 +43,14 @@ const useDrawing = () => {
   };
 
   const updateNavigator = () => {
-    const image = canvasEl.current?.toDataURL();
-    if (image) setNavImage(image);
+    const navImage = canvasEl.current?.toDataURL();
+    if (navImage) setNavImage(navImage);
+
+    const downloadImage = canvasEl.current?.toDataURL("image/jpeg", 1);
+    if (downloadImage) setDownloadImage(downloadImage);
   };
 
-  const saveState = () => {
+  const saveState = useCallback(() => {
     if (canvasEl.current) {
       const newUrl = canvasEl.current.toDataURL();
       if (undoArray.length >= 5) {
@@ -58,29 +63,32 @@ const useDrawing = () => {
         setUndoArray((prev) => [...prev, newUrl]);
       }
     }
-  };
+  }, [undoArray.length]);
 
-  const onMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (mode === "NONE") return;
+  const onMouseDown = useCallback(
+    (e: React.MouseEvent<HTMLCanvasElement>) => {
+      if (mode === "NONE") return;
 
-    saveState();
+      saveState();
 
-    const context = canvasEl.current?.getContext("2d");
-    const currentPosition = getMousePosition(e);
-    if (context && currentPosition) {
-      setMouseDown(true);
-      context.beginPath();
-      context.moveTo(currentPosition.x, currentPosition.y);
-      context.lineCap = "round";
-      if (mode === "BRUSH") {
-        context.strokeStyle = color;
-        context.lineWidth = Number(size);
-      } else if (mode === "ERASER") {
-        context.strokeStyle = eraserColor;
-        context.lineWidth = 50;
+      const context = canvasEl.current?.getContext("2d");
+      const currentPosition = getMousePosition(e);
+      if (context && currentPosition) {
+        setMouseDown(true);
+        context.beginPath();
+        context.moveTo(currentPosition.x, currentPosition.y);
+        context.lineCap = "round";
+        if (mode === "BRUSH") {
+          context.strokeStyle = color;
+          context.lineWidth = Number(size);
+        } else if (mode === "ERASER") {
+          context.strokeStyle = eraserColor;
+          context.lineWidth = 50;
+        }
       }
-    }
-  };
+    },
+    [color, mode, saveState, size]
+  );
 
   const onMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!isMouseDown) return;
@@ -108,7 +116,7 @@ const useDrawing = () => {
     setNavigatorShow(!isNavigatorShow);
   };
 
-  const onClickUndo = () => {
+  const onClickUndo = useCallback(() => {
     if (undoArray.length === 0) return;
 
     const context = canvasEl.current?.getContext("2d");
@@ -134,6 +142,7 @@ const useDrawing = () => {
             canvasEl.current.width,
             canvasEl.current.height
           );
+          updateNavigator();
         }
       };
       if (previousDataUrl) previousImage.src = previousDataUrl;
@@ -141,15 +150,18 @@ const useDrawing = () => {
         return prev.filter((el, i) => i !== prev.length - 1);
       });
     }
-  };
+  }, [undoArray]);
 
-  useEffect(() => {
+  const onClickClear = useCallback(() => {
+    setUndoArray([]);
     initCanvasBackgroundColor();
+    updateNavigator();
   }, []);
 
   useEffect(() => {
-    console.log(undoArray);
-  }, [undoArray]);
+    initCanvasBackgroundColor();
+    updateNavigator();
+  }, []);
 
   return {
     canvasEl,
@@ -159,6 +171,7 @@ const useDrawing = () => {
     isNavigatorShow,
     navImage,
     undoArray,
+    downloadImage,
     onClickBrush,
     onChangeColor,
     onChangeSize,
@@ -168,6 +181,7 @@ const useDrawing = () => {
     onClickEraser,
     onClickNavigator,
     onClickUndo,
+    onClickClear,
   };
 };
 

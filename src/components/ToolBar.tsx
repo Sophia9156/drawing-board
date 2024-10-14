@@ -13,10 +13,12 @@ interface Props {
   isNavigatorShow: boolean;
   color: string;
   undoArray: string[];
+  downloadImage: string;
   onClickBrush: () => void;
   onClickEraser: () => void;
   onClickNavigator: () => void;
   onClickUndo: () => void;
+  onClickClear: () => void;
   onChangeColor: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
@@ -26,10 +28,12 @@ const ToolBar: React.FC<Props> = (props) => {
     isNavigatorShow,
     color,
     undoArray,
+    downloadImage,
     onClickBrush,
     onChangeColor,
     onClickNavigator,
     onClickUndo,
+    onClickClear,
     onClickEraser,
   } = props;
 
@@ -63,11 +67,11 @@ const ToolBar: React.FC<Props> = (props) => {
       >
         <FontAwesomeIcon className="fas" icon={faUndo} />
       </div>
-      <div className="tool clear" id="clear">
+      <div className="tool clear" id="clear" onClick={onClickClear}>
         <FontAwesomeIcon className="fas" icon={faTrashAlt} />
       </div>
       <div className="tool dl">
-        <a id="download">
+        <a id="download" href={downloadImage} download="example.jpg">
           <FontAwesomeIcon className="fas" icon={faDownload} />
         </a>
       </div>
