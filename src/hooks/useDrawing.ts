@@ -9,6 +9,7 @@ const useDrawing = () => {
   const [size, setSize] = useState("10");
   const [isNavigatorShow, setNavigatorShow] = useState(false);
   const [navImage, setNavImage] = useState<string | null>(null);
+  const [undoArray, setUndoArray] = useState<string[]>([]);
 
   const onClickBrush = () => {
     setMode(mode === "BRUSH" ? "NONE" : "BRUSH");
@@ -44,8 +45,25 @@ const useDrawing = () => {
     if (image) setNavImage(image);
   };
 
+  const saveState = () => {
+    if (canvasEl.current) {
+      const newUrl = canvasEl.current.toDataURL();
+      if (undoArray.length >= 5) {
+        setUndoArray((prev) => {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const [_, ...rest] = prev;
+          return [...rest, newUrl];
+        });
+      } else {
+        setUndoArray((prev) => [...prev, newUrl]);
+      }
+    }
+  };
+
   const onMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (mode === "NONE") return;
+
+    saveState();
 
     const context = canvasEl.current?.getContext("2d");
     const currentPosition = getMousePosition(e);
@@ -78,7 +96,7 @@ const useDrawing = () => {
   const onMouseUp = () => {
     if (mode === "NONE") return;
     setMouseDown(false);
-    updateNavigator();
+    if (isNavigatorShow) updateNavigator();
   };
 
   const onClickEraser = () => {
@@ -86,12 +104,52 @@ const useDrawing = () => {
   };
 
   const onClickNavigator = () => {
+    if (!isNavigatorShow) updateNavigator();
     setNavigatorShow(!isNavigatorShow);
+  };
+
+  const onClickUndo = () => {
+    if (undoArray.length === 0) return;
+
+    const context = canvasEl.current?.getContext("2d");
+    if (context) {
+      const previousDataUrl = undoArray[undoArray.length - 1];
+      const previousImage = new Image();
+      previousImage.onload = () => {
+        if (canvasEl.current) {
+          context.clearRect(
+            0,
+            0,
+            canvasEl.current.width,
+            canvasEl.current.height
+          );
+          context.drawImage(
+            previousImage,
+            0,
+            0,
+            canvasEl.current.width,
+            canvasEl.current.height,
+            0,
+            0,
+            canvasEl.current.width,
+            canvasEl.current.height
+          );
+        }
+      };
+      if (previousDataUrl) previousImage.src = previousDataUrl;
+      setUndoArray((prev) => {
+        return prev.filter((el, i) => i !== prev.length - 1);
+      });
+    }
   };
 
   useEffect(() => {
     initCanvasBackgroundColor();
   }, []);
+
+  useEffect(() => {
+    console.log(undoArray);
+  }, [undoArray]);
 
   return {
     canvasEl,
@@ -100,6 +158,7 @@ const useDrawing = () => {
     size,
     isNavigatorShow,
     navImage,
+    undoArray,
     onClickBrush,
     onChangeColor,
     onChangeSize,
@@ -108,6 +167,7 @@ const useDrawing = () => {
     onMouseUp,
     onClickEraser,
     onClickNavigator,
+    onClickUndo,
   };
 };
 

@@ -12,9 +12,11 @@ interface Props {
   mode: ModeUnion;
   isNavigatorShow: boolean;
   color: string;
+  undoArray: string[];
   onClickBrush: () => void;
   onClickEraser: () => void;
   onClickNavigator: () => void;
+  onClickUndo: () => void;
   onChangeColor: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
@@ -23,9 +25,11 @@ const ToolBar: React.FC<Props> = (props) => {
     mode,
     isNavigatorShow,
     color,
+    undoArray,
     onClickBrush,
     onChangeColor,
     onClickNavigator,
+    onClickUndo,
     onClickEraser,
   } = props;
 
@@ -52,7 +56,11 @@ const ToolBar: React.FC<Props> = (props) => {
       >
         <FontAwesomeIcon className="fas" icon={faMap} />
       </div>
-      <div className="tool undo" id="undo">
+      <div
+        className={`tool undo ${undoArray.length < 1 ? "disabled" : ""}`}
+        id="undo"
+        onClick={onClickUndo}
+      >
         <FontAwesomeIcon className="fas" icon={faUndo} />
       </div>
       <div className="tool clear" id="clear">

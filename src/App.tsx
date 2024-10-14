@@ -12,6 +12,7 @@ function App() {
     size,
     isNavigatorShow,
     navImage,
+    undoArray,
     onClickBrush,
     onChangeColor,
     onChangeSize,
@@ -20,6 +21,7 @@ function App() {
     onMouseUp,
     onClickEraser,
     onClickNavigator,
+    onClickUndo,
   } = useDrawing();
 
   return (
@@ -28,9 +30,11 @@ function App() {
         mode={mode}
         isNavigatorShow={isNavigatorShow}
         color={color}
+        undoArray={undoArray}
         onClickBrush={onClickBrush}
         onClickEraser={onClickEraser}
         onClickNavigator={onClickNavigator}
+        onClickUndo={onClickUndo}
         onChangeColor={onChangeColor}
       />
       <DrawingBoard
