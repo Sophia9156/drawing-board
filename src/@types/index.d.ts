@@ -1,0 +1,1 @@
+type ModeUnion = "NONE" | "BRUSH";
